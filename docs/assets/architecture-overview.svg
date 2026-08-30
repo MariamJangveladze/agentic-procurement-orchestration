@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980" role="img" aria-labelledby="title desc">
+  <title id="title">Agentic procurement orchestration architecture</title>
+  <desc id="desc">A governed procurement system in which employees use a React request hub, FastAPI commands a durable LangGraph workflow, LangChain agents prepare evidence, Supabase stores business state and documents, and humans retain all binding decisions.</desc>
+  <defs>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.4" fill="#2a2733"/>
+    </pattern>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b793ff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#6b38df" stop-opacity="0.04"/>
+    </linearGradient>
+    <linearGradient id="control" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#271c3c"/>
+      <stop offset="1" stop-color="#17131f"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000" flood-opacity="0.38"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#a98ae8"/>
+    </marker>
+    <style>
+      .eyebrow { font: 600 15px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 2.4px; fill: #a98ae8; }
+      .title { font: 650 42px Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #f7f4fb; }
+      .subtitle { font: 400 18px Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #aaa5b2; }
+      .lane { font: 600 13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 1.7px; fill: #8a8492; }
+      .node-title { font: 650 21px Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #f7f4fb; }
+      .node-copy { font: 400 15px Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #aaa5b2; }
+      .chip { font: 600 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 1px; fill: #ddd2f7; }
+      .actor { font: 600 16px Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #e9e5ee; }
+      .footer { font: 600 18px Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #f7f4fb; }
+      .line { fill: none; stroke: #6f667a; stroke-width: 2; marker-end: url(#arrow); }
+      .soft-line { fill: none; stroke: #48414f; stroke-width: 2; stroke-dasharray: 6 8; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1600" height="980" rx="28" fill="#0b0a0d"/>
+  <rect width="1600" height="980" rx="28" fill="url(#dots)" opacity="0.74"/>
+  <rect x="0" y="0" width="1600" height="172" rx="28" fill="url(#hero)"/>
+
+  <text x="72" y="58" class="eyebrow">SYSTEM ARCHITECTURE / GOVERNED AGENTIC WORKFLOW</text>
+  <text x="72" y="108" class="title">Agentic Procurement Orchestration</text>
+  <text x="72" y="141" class="subtitle">Deterministic policy controls the process · agents prepare evidence · people make every binding decision</text>
+  <rect x="1290" y="54" width="238" height="48" rx="24" fill="#17131d" stroke="#7d5dbd"/>
+  <circle cx="1322" cy="78" r="7" fill="#b793ff"/>
+  <text x="1342" y="84" class="chip">HUMAN CONTROLLED</text>
+
+  <text x="72" y="211" class="lane">01 / ACCOUNTABLE PEOPLE</text>
+  <g filter="url(#shadow)">
+    <rect x="72" y="232" width="252" height="76" rx="14" fill="#151318" stroke="#302b35"/>
+    <rect x="344" y="232" width="252" height="76" rx="14" fill="#151318" stroke="#302b35"/>
+    <rect x="616" y="232" width="252" height="76" rx="14" fill="#151318" stroke="#302b35"/>
+    <rect x="888" y="232" width="252" height="76" rx="14" fill="#151318" stroke="#302b35"/>
+    <rect x="1160" y="232" width="368" height="76" rx="14" fill="#20182d" stroke="#7658b1"/>
+  </g>
+  <circle cx="104" cy="270" r="14" fill="#392a54"/><text x="131" y="276" class="actor">Requester</text>
+  <circle cx="376" cy="270" r="14" fill="#392a54"/><text x="403" y="276" class="actor">Department Head</text>
+  <circle cx="648" cy="270" r="14" fill="#392a54"/><text x="675" y="276" class="actor">Logistics</text>
+  <circle cx="920" cy="270" r="14" fill="#392a54"/><text x="947" y="276" class="actor">Finance + Legal</text>
+  <path d="M1192 270 l9 9 18-20" fill="none" stroke="#cdb9fb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="1232" y="264" class="actor">Approval gates</text>
+  <text x="1232" y="286" class="node-copy">approve · reject · request information</text>
+
+  <path d="M800 308 L800 358" class="line"/>
+
+  <text x="72" y="371" class="lane">02 / TRUSTED APPLICATION PATH</text>
+  <g filter="url(#shadow)">
+    <rect x="72" y="396" width="330" height="156" rx="18" fill="#151318" stroke="#36303c"/>
+    <rect x="456" y="396" width="268" height="156" rx="18" fill="#151318" stroke="#36303c"/>
+    <rect x="778" y="372" width="486" height="204" rx="22" fill="url(#control)" stroke="#8a66ce" stroke-width="2"/>
+    <rect x="1318" y="396" width="210" height="156" rx="18" fill="#151318" stroke="#36303c"/>
+  </g>
+
+  <text x="104" y="430" class="eyebrow">EXPERIENCE</text>
+  <text x="104" y="465" class="node-title">React Request Hub</text>
+  <text x="104" y="493" class="node-copy">Requests · case views · documents</text>
+  <text x="104" y="517" class="node-copy">role-specific action cards · timeline</text>
+  <rect x="104" y="528" width="104" height="24" rx="12" fill="#241b32"/><text x="120" y="545" class="chip">VERCEL UI</text>
+
+  <text x="488" y="430" class="eyebrow">TRUST BOUNDARY</text>
+  <text x="488" y="465" class="node-title">FastAPI</text>
+  <text x="488" y="493" class="node-copy">Validates commands, identity,</text>
+  <text x="488" y="517" class="node-copy">roles and case permissions</text>
+  <rect x="488" y="528" width="132" height="24" rx="12" fill="#241b32"/><text x="504" y="545" class="chip">SERVER ONLY</text>
+
+  <text x="814" y="411" class="eyebrow">CONTROL PLANE</text>
+  <text x="814" y="449" class="node-title">Durable LangGraph Workflow</text>
+  <text x="814" y="477" class="node-copy">Typed state · deterministic routing · checkpoint / resume</text>
+  <rect x="814" y="502" width="126" height="43" rx="10" fill="#151318" stroke="#55426e"/>
+  <rect x="951" y="502" width="133" height="43" rx="10" fill="#151318" stroke="#55426e"/>
+  <rect x="1095" y="502" width="133" height="43" rx="10" fill="#151318" stroke="#55426e"/>
+  <text x="833" y="528" class="chip">POLICY CODE</text>
+  <text x="968" y="528" class="chip">HITL PAUSE</text>
+  <text x="1113" y="528" class="chip">AUDIT EVENT</text>
+
+  <text x="1350" y="430" class="eyebrow">EVIDENCE</text>
+  <text x="1350" y="465" class="node-title">LangSmith</text>
+  <text x="1350" y="493" class="node-copy">Traces · evaluation</text>
+  <text x="1350" y="517" class="node-copy">latency · debugging</text>
+
+  <path d="M402 474 L456 474" class="line"/>
+  <path d="M724 474 L778 474" class="line"/>
+  <path d="M1264 474 L1318 474" class="soft-line"/>
+
+  <text x="72" y="639" class="lane">03 / BOUNDED CAPABILITIES + DURABLE DATA</text>
+  <g filter="url(#shadow)">
+    <rect x="72" y="664" width="456" height="202" rx="18" fill="#151318" stroke="#36303c"/>
+    <rect x="572" y="664" width="530" height="202" rx="18" fill="#151318" stroke="#36303c"/>
+    <rect x="1146" y="664" width="382" height="202" rx="18" fill="#151318" stroke="#36303c"/>
+  </g>
+
+  <text x="104" y="702" class="eyebrow">LANGCHAIN AGENTS</text>
+  <text x="104" y="738" class="node-title">Advisory intelligence</text>
+  <text x="104" y="769" class="node-copy">Intake · supplier evidence · review packs</text>
+  <text x="104" y="795" class="node-copy">agreement drafting · cited retrieval</text>
+  <rect x="104" y="821" width="185" height="25" rx="12" fill="#241b32"/><text x="120" y="838" class="chip">NO APPROVAL AUTHORITY</text>
+  <rect x="300" y="821" width="168" height="25" rx="12" fill="#1c1920"/><text x="316" y="838" class="chip">OPTIONAL DEEP AGENT</text>
+
+  <text x="604" y="702" class="eyebrow">SUPABASE DATA PLANE</text>
+  <text x="604" y="738" class="node-title">Business record + runtime state</text>
+  <text x="604" y="769" class="node-copy">Cases · actions · events · messages · roles</text>
+  <text x="604" y="795" class="node-copy">LangGraph checkpoints · pgvector · private files</text>
+  <rect x="604" y="821" width="129" height="25" rx="12" fill="#241b32"/><text x="620" y="838" class="chip">POSTGRESQL</text>
+  <rect x="744" y="821" width="105" height="25" rx="12" fill="#241b32"/><text x="760" y="838" class="chip">PGVECTOR</text>
+  <rect x="860" y="821" width="159" height="25" rx="12" fill="#241b32"/><text x="876" y="838" class="chip">OBJECT STORAGE</text>
+
+  <text x="1178" y="702" class="eyebrow">CONTROLLED ADAPTERS</text>
+  <text x="1178" y="738" class="node-title">Organization systems</text>
+  <text x="1178" y="769" class="node-copy">Budget source · supplier registry</text>
+  <text x="1178" y="795" class="node-copy">identity / SSO · document services</text>
+  <rect x="1178" y="821" width="171" height="25" rx="12" fill="#241b32"/><text x="1194" y="838" class="chip">LEAST PRIVILEGE</text>
+
+  <path d="M906 576 C850 618 500 611 356 664" class="line"/>
+  <path d="M1018 576 L837 664" class="line"/>
+  <path d="M1136 576 C1200 620 1298 620 1337 664" class="line"/>
+  <path d="M528 765 L572 765" class="soft-line"/>
+  <path d="M1102 765 L1146 765" class="soft-line"/>
+
+  <rect x="72" y="909" width="1456" height="1" fill="#3c3542"/>
+  <circle cx="88" cy="940" r="7" fill="#b793ff"/>
+  <text x="110" y="947" class="footer">LangGraph controls what happens next. Policy controls what is allowed. Humans control every consequential outcome.</text>
+</svg>

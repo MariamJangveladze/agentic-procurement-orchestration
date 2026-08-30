@@ -4,6 +4,12 @@ Production-minded architecture and runnable demo for an organization's internal 
 
 The project demonstrates how a financial organization can combine deterministic policy, agent-assisted evidence preparation, durable workflow state, and accountable human decisions without giving an LLM authority over procurement outcomes.
 
+## Architecture at a glance
+
+![Agentic procurement orchestration architecture](docs/assets/architecture-overview.svg)
+
+The system separates the human decision layer, trusted application path, bounded agent capabilities, and durable data plane. See the [step-by-step architecture](docs/STEP_BY_STEP_ARCHITECTURE.md) for the workflow graph, control map, implementation status, and production-hardening path.
+
 ## What is implemented
 
 - [`docs/STEP_BY_STEP_ARCHITECTURE.md`](docs/STEP_BY_STEP_ARCHITECTURE.md) — proposed prototype architecture, workflow, human-control boundaries, local/cloud deployment, and implementation sequence.
