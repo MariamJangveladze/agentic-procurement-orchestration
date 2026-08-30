@@ -56,7 +56,7 @@ app.add_middleware(
     allow_origins=sorted(cors_allowed_origins),
     allow_credentials=False,
     allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type", "Authorization", "X-Demo-User-Id"],
+    allow_headers=["Content-Type", "Authorization", "X-Demo-User-Id", "X-Demo-API-Token"],
     max_age=600,
 )
 
@@ -85,8 +85,18 @@ DEMO_USERS: dict[str, dict[str, str]] = {
 }
 
 
-def current_user(x_demo_user_id: str | None = Header(default=None)) -> dict[str, str]:
-    user = DEMO_USERS.get(x_demo_user_id or "nino")
+def current_user(
+    x_demo_user_id: str | None = Header(default=None),
+    x_demo_api_token: str | None = Header(default=None),
+) -> dict[str, str]:
+    expected = os.getenv("DEMO_API_TOKEN", "")
+    if not expected:
+        raise HTTPException(status_code=503, detail="Set DEMO_API_TOKEN before using the demo API.")
+    if not x_demo_api_token or not secrets.compare_digest(x_demo_api_token, expected):
+        raise HTTPException(status_code=401, detail="Invalid demo API token.")
+    if not x_demo_user_id:
+        raise HTTPException(status_code=401, detail="Select an explicit test user.")
+    user = DEMO_USERS.get(x_demo_user_id)
     if user is None:
         raise HTTPException(status_code=401, detail="Unknown test user.")
     return user
@@ -581,9 +591,20 @@ async def upload_case_document(
     content = await file.read()
     if not content:
         raise HTTPException(status_code=422, detail="The uploaded file is empty.")
-    if len(content) > 52_428_800:
-        raise HTTPException(status_code=413, detail="Attachment exceeds the 50 MB limit.")
+    if len(content) > 10_485_760:
+        raise HTTPException(status_code=413, detail="Attachment exceeds the 10 MB limit.")
     content_type = file.content_type or "application/octet-stream"
+    allowed_content_types = {
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "image/jpeg",
+        "image/png",
+        "text/csv",
+        "text/plain",
+    }
+    if content_type not in allowed_content_types:
+        raise HTTPException(status_code=415, detail="Unsupported attachment type.")
     storage_path = f"{case_id}/{uuid4().hex}-{_safe_file_name(file.filename or 'attachment')}"
     case_store.client.storage.from_("case-attachments").upload(storage_path, content, {"content-type": content_type})
     persisted = (

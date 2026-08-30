@@ -120,3 +120,8 @@ Every workflow invocation is tagged `logistics-procurement`, `hitl`, and `local-
 ## Portfolio scope
 
 All sample people, suppliers, requests, and documents are fictional. The repository is an independent portfolio demonstration and is not a representation of any specific organization's production policy or infrastructure.
+
+## Usage and copyright
+
+Portfolio review only. No open-source license is granted. See [COPYRIGHT.md](COPYRIGHT.md)
+and report security concerns privately as described in [SECURITY.md](SECURITY.md).
