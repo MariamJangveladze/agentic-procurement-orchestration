@@ -4,9 +4,14 @@ from __future__ import annotations
 
 import streamlit as st
 
-from procurement_demo.graph import build_graph, interrupt_payloads, invoke_case, new_case_input, resume_case
+from procurement_demo.graph import (
+    build_graph,
+    interrupt_payloads,
+    invoke_case,
+    new_case_input,
+    resume_case,
+)
 from procurement_demo.models import ProcurementRequest
-
 
 st.set_page_config(page_title="Logistics Procurement Demo", layout="wide")
 
@@ -53,7 +58,17 @@ def decision_form(payload: dict) -> None:
             action = st.radio("Action", ["resubmit", "stop"], horizontal=True)
             comment = st.text_area("Rework comment")
             if st.form_submit_button("Submit Rework Decision"):
-                submit_response({"action": action, "comment": comment})
+                submit_response({"decision": action, "comment": comment})
+        return
+
+    if kind == "tender_preparation":
+        with st.form("tender-preparation"):
+            comment = st.text_area("Tender preparation reference")
+            action = st.radio(
+                "Action", ["submit_tender_preparation", "stop"], horizontal=True
+            )
+            if st.form_submit_button("Submit Tender Decision"):
+                submit_response({"decision": action, "comment": comment})
         return
 
     if kind in {"logistics_authorization", "ceo_approval", "agreement_review", "requester_acceptance"}:
@@ -76,7 +91,7 @@ def decision_form(payload: dict) -> None:
         with st.form(kind):
             comment = st.text_area(label)
             if st.form_submit_button("Confirm"):
-                submit_response({"action": "record_delivery" if kind == "delivery_record" else "confirm_received", "comment": comment})
+                submit_response({"decision": "record_delivery" if kind == "delivery_record" else "confirm_received", "comment": comment})
         return
 
     st.error(f"Unsupported interrupt type: {kind}")

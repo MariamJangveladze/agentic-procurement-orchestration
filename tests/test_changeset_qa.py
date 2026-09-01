@@ -3,11 +3,18 @@
 from __future__ import annotations
 
 import ast
+import runpy
 from pathlib import Path
 
 from procurement_demo.agents import ProcurementAgents
 from procurement_demo.budget import FixedBudgetProvider
-from procurement_demo.graph import build_graph, interrupt_payloads, invoke_case, new_case_input, resume_case
+from procurement_demo.graph import (
+    build_graph,
+    interrupt_payloads,
+    invoke_case,
+    new_case_input,
+    resume_case,
+)
 from procurement_demo.knowledge import DEMO_DOCUMENTS, LocalKnowledgeBase
 from procurement_demo.models import Decision, ProcurementRequest, SupplierResearch
 
@@ -195,6 +202,18 @@ def test_model_disabled_workflow_completes_without_provider_calls():
     result = resume_case(graph, initial["case_id"], {"decision": "confirm_received"})
     assert result["status"] == "closed"
     assert result["model_used"] is False
+
+
+def test_documented_terminal_demo_completes(capsys):
+    runpy.run_path("run_demo.py", run_name="__main__")
+    output = capsys.readouterr().out
+    assert "finished with status: closed" in output
+
+
+def test_streamlit_adapter_uses_graph_decision_contract_and_handles_tender():
+    source = Path("app.py").read_text()
+    assert 'if kind == "tender_preparation"' in source
+    assert 'submit_response({"action":' not in source
 
 
 def test_all_agent_entry_points_fall_back_when_the_model_provider_fails(monkeypatch):

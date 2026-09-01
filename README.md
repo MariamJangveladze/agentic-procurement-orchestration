@@ -30,6 +30,12 @@ uv sync --all-groups
 uv run streamlit run app.py
 ```
 
+The trusted API requires the reviewer to provide their own local
+`DEMO_API_TOKEN`. No API keys, credentials, or reusable secret values are
+included in this repository. Provider-backed model testing additionally
+requires the reviewer's own provider API key; the deterministic demo remains
+available without a model-provider key.
+
 The demo runs in deterministic mode when `PROCUREMENT_MODEL` is empty. Set a supported LangChain model string and the corresponding provider key in `.env` to activate the real agents; for example:
 
 ```dotenv
@@ -45,6 +51,10 @@ Run the terminal scenario or tests with:
 uv run python run_demo.py
 uv run pytest
 ```
+
+The terminal walkthrough uses a deterministic fictional budget allocation so
+the documented first run does not depend on Google Sheets availability. The
+Streamlit/server path retains the read-only Google Sheets budget adapter.
 
 ## Supabase: Auth, workflow management and vector RAG
 
