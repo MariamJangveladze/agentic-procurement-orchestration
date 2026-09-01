@@ -45,11 +45,28 @@ def decision_form(payload: dict) -> None:
         with st.form("logistics-preparation"):
             supplier_name = st.text_input("Supplier name", value="Atlas Office Systems")
             existing = st.checkbox("Existing approved supplier", value=True)
-            amount = st.number_input("Logistics estimated cost (GEL)", min_value=1.0, value=8500.0, step=100.0)
+            amount = st.number_input(
+                "Logistics estimated cost (GEL)",
+                min_value=1.0,
+                value=8500.0,
+                step=100.0,
+            )
             offer_reference = st.text_input("Offer reference", value="OFFER-2026-001")
-            notes = st.text_area("Logistics notes", value="Demo offer validated by Logistics.")
+            notes = st.text_area(
+                "Logistics notes", value="Demo offer validated by Logistics."
+            )
             if st.form_submit_button("Submit Logistics Research"):
-                submit_response({"research": {"supplier_name": supplier_name, "is_existing_supplier": existing, "estimated_cost_gel": amount, "offer_reference": offer_reference, "notes": notes}})
+                submit_response(
+                    {
+                        "research": {
+                            "supplier_name": supplier_name,
+                            "is_existing_supplier": existing,
+                            "estimated_cost_gel": amount,
+                            "offer_reference": offer_reference,
+                            "notes": notes,
+                        }
+                    }
+                )
         return
 
     if kind == "logistics_rework":
@@ -71,7 +88,12 @@ def decision_form(payload: dict) -> None:
                 submit_response({"decision": action, "comment": comment})
         return
 
-    if kind in {"logistics_authorization", "ceo_approval", "agreement_review", "requester_acceptance"}:
+    if kind in {
+        "logistics_authorization",
+        "ceo_approval",
+        "agreement_review",
+        "requester_acceptance",
+    }:
         if kind == "agreement_review":
             st.code(value["draft"], language="text")
             options = ["approve", "revise", "reject"]
@@ -87,11 +109,20 @@ def decision_form(payload: dict) -> None:
         return
 
     if kind in {"delivery_record", "signed_act"}:
-        label = "Delivery details" if kind == "delivery_record" else "Signed act reference"
+        label = (
+            "Delivery details" if kind == "delivery_record" else "Signed act reference"
+        )
         with st.form(kind):
             comment = st.text_area(label)
             if st.form_submit_button("Confirm"):
-                submit_response({"decision": "record_delivery" if kind == "delivery_record" else "confirm_received", "comment": comment})
+                submit_response(
+                    {
+                        "decision": "record_delivery"
+                        if kind == "delivery_record"
+                        else "confirm_received",
+                        "comment": comment,
+                    }
+                )
         return
 
     st.error(f"Unsupported interrupt type: {kind}")
@@ -113,7 +144,9 @@ def control_review_forms(payloads: list[dict]) -> None:
                     horizontal=True,
                     key=f"{role}-decision-{value['round_number']}",
                 )
-                comment = st.text_area("Comment", key=f"{role}-comment-{value['round_number']}")
+                comment = st.text_area(
+                    "Comment", key=f"{role}-comment-{value['round_number']}"
+                )
                 resume_map[payload["id"]] = {"decision": decision, "comment": comment}
         if st.form_submit_button("Submit all control reviews"):
             submit_response(resume_map)
@@ -125,18 +158,37 @@ def render_case() -> None:
     left, right = st.columns([1, 1])
     with left:
         st.subheader("Case data")
-        st.json({key: result.get(key) for key in ("request", "research", "budget") if result.get(key)})
+        st.json(
+            {
+                key: result.get(key)
+                for key in ("request", "research", "budget")
+                if result.get(key)
+            }
+        )
     with right:
         st.subheader("Agent output")
         if result.get("supplier_evidence"):
-            st.text_area("Supplier evidence", result["supplier_evidence"], height=220, disabled=True)
+            st.text_area(
+                "Supplier evidence",
+                result["supplier_evidence"],
+                height=220,
+                disabled=True,
+            )
         if result.get("review_pack"):
-            st.text_area("Review pack", result["review_pack"], height=220, disabled=True)
-        st.caption("Real LangChain model used" if result.get("model_used") else "Deterministic local fallback used")
+            st.text_area(
+                "Review pack", result["review_pack"], height=220, disabled=True
+            )
+        st.caption(
+            "Real LangChain model used"
+            if result.get("model_used")
+            else "Deterministic local fallback used"
+        )
 
     st.subheader("Audit timeline")
     for event in result.get("audit_events", []):
-        st.write(f"`{event['timestamp']}` — **{event['actor']}**: {event['event']} — {event['detail']}")
+        st.write(
+            f"`{event['timestamp']}` — **{event['actor']}**: {event['event']} — {event['detail']}"
+        )
 
     pending = interrupt_payloads(result)
     if not pending:
@@ -147,22 +199,35 @@ def render_case() -> None:
     elif len(pending) == 1:
         decision_form(pending[0])
     else:
-        st.error("Unexpected mixed approval batch. Resume controls as a group in this demo.")
+        st.error(
+            "Unexpected mixed approval batch. Resume controls as a group in this demo."
+        )
 
 
 st.title("Logistics Procurement — all value bands")
-st.caption("Local LangGraph workflow with LangChain evidence, review-pack and agreement-drafting agents.")
+st.caption(
+    "Local LangGraph workflow with LangChain evidence, review-pack and agreement-drafting agents."
+)
 
 if "result" not in st.session_state:
     with st.form("create-request"):
         st.subheader("1. Register request")
         procurement_type = st.selectbox("Procurement type", ["material", "service"])
         subcategories = {
-            "material": ["equipment", "stationery request", "hospitality", "business travel", "vehicle maintenance", "other"],
+            "material": [
+                "equipment",
+                "stationery request",
+                "hospitality",
+                "business travel",
+                "vehicle maintenance",
+                "other",
+            ],
             "service": ["cleaning service", "repairs", "vehicle maintenance", "other"],
         }
         subcategory = st.selectbox("Subcategory", subcategories[procurement_type])
-        description = st.text_area("Description", value="Procure laptops for the new service desk team.")
+        description = st.text_area(
+            "Description", value="Procure laptops for the new service desk team."
+        )
         deadline = st.date_input("Deadline")
         if st.form_submit_button("Create procurement case"):
             request = ProcurementRequest(

@@ -26,15 +26,33 @@ def response_for(payload: dict) -> dict:
                 "notes": "Local demo supplier research.",
             }
         },
-        "logistics_authorization": {"decision": "approve", "comment": "Logistics authority approved."},
+        "logistics_authorization": {
+            "decision": "approve",
+            "comment": "Logistics authority approved.",
+        },
         "ceo_approval": {"decision": "approve", "comment": "CEO approved."},
-        "tender_preparation": {"decision": "submit_tender_preparation", "comment": "Tender pack prepared."},
-        "delivery_record": {"decision": "record_delivery", "comment": "Delivered to Operations."},
-        "requester_acceptance": {"decision": "approve", "comment": "Accepted by requester."},
-        "signed_act": {"decision": "confirm_received", "comment": "Signed acceptance act received."},
+        "tender_preparation": {
+            "decision": "submit_tender_preparation",
+            "comment": "Tender pack prepared.",
+        },
+        "delivery_record": {
+            "decision": "record_delivery",
+            "comment": "Delivered to Operations.",
+        },
+        "requester_acceptance": {
+            "decision": "approve",
+            "comment": "Accepted by requester.",
+        },
+        "signed_act": {
+            "decision": "confirm_received",
+            "comment": "Signed acceptance act received.",
+        },
     }
     if kind == "control_review":
-        return {"decision": "approve", "comment": f"{payload['value']['role']} approved."}
+        return {
+            "decision": "approve",
+            "comment": f"{payload['value']['role']} approved.",
+        }
     return responses[kind]
 
 
@@ -58,7 +76,11 @@ def main() -> None:
         if steps > MAX_DEMO_STEPS:
             raise RuntimeError(f"Demo exceeded the {MAX_DEMO_STEPS}-step safety limit.")
         if len(pending) > 1:
-            result = resume_case(graph, initial["case_id"], {item["id"]: response_for(item) for item in pending})
+            result = resume_case(
+                graph,
+                initial["case_id"],
+                {item["id"]: response_for(item) for item in pending},
+            )
         else:
             result = resume_case(graph, initial["case_id"], response_for(pending[0]))
     print(f"Case {initial['case_id']} finished with status: {result['status']}")
