@@ -3,11 +3,18 @@
 from __future__ import annotations
 
 import ast
+import runpy
 from pathlib import Path
 
 from procurement_demo.agents import ProcurementAgents
 from procurement_demo.budget import FixedBudgetProvider
-from procurement_demo.graph import build_graph, interrupt_payloads, invoke_case, new_case_input, resume_case
+from procurement_demo.graph import (
+    build_graph,
+    interrupt_payloads,
+    invoke_case,
+    new_case_input,
+    resume_case,
+)
 from procurement_demo.knowledge import DEMO_DOCUMENTS, LocalKnowledgeBase
 from procurement_demo.models import Decision, ProcurementRequest, SupplierResearch
 
@@ -38,7 +45,9 @@ def _research(cost: float) -> dict[str, object]:
 def _graph(*, budget: float = 20_000):
     # Explicit dependencies keep the verification fully offline, regardless of .env.
     return build_graph(
-        agents=ProcurementAgents(LocalKnowledgeBase(documents=DEMO_DOCUMENTS), model_name=None),
+        agents=ProcurementAgents(
+            LocalKnowledgeBase(documents=DEMO_DOCUMENTS), model_name=None
+        ),
         budget_provider=FixedBudgetProvider(budget),
     )
 
@@ -46,7 +55,9 @@ def _graph(*, budget: float = 20_000):
 def _resume_reviews(graph, case_id: str, result: dict, decision: str) -> dict:
     pending = interrupt_payloads(result)
     assert {item["value"]["role"] for item in pending} == {"finance", "legal"}
-    return resume_case(graph, case_id, {item["id"]: {"decision": decision} for item in pending})
+    return resume_case(
+        graph, case_id, {item["id"]: {"decision": decision} for item in pending}
+    )
 
 
 def _to_control_reviews(graph, initial: dict, cost: float) -> dict:
@@ -62,18 +73,31 @@ def _graph_interrupt_specs() -> dict[str, set[str]]:
     tree = ast.parse(Path("src/procurement_demo/graph.py").read_text())
     specs: dict[str, set[str]] = {}
     for node in ast.walk(tree):
-        if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Name) or node.func.id != "interrupt":
+        if (
+            not isinstance(node, ast.Call)
+            or not isinstance(node.func, ast.Name)
+            or node.func.id != "interrupt"
+        ):
             continue
         payload = node.args[0]
         assert isinstance(payload, ast.Dict)
-        values = {key.value: value for key, value in zip(payload.keys, payload.values) if isinstance(key, ast.Constant)}
+        values = {
+            key.value: value
+            for key, value in zip(payload.keys, payload.values)
+            if isinstance(key, ast.Constant)
+        }
         kind = values["kind"]
         allowed = values["allowed_decisions"]
         assert isinstance(kind, ast.Constant) and isinstance(kind.value, str)
+
         def decision_value(item: ast.AST) -> str:
             if isinstance(item, ast.Constant) and isinstance(item.value, str):
                 return item.value
-            if isinstance(item, ast.Attribute) and isinstance(item.value, ast.Name) and item.value.id == "Decision":
+            if (
+                isinstance(item, ast.Attribute)
+                and isinstance(item.value, ast.Name)
+                and item.value.id == "Decision"
+            ):
                 return getattr(Decision, item.attr).value
             if (
                 isinstance(item, ast.Attribute)
@@ -103,17 +127,34 @@ def _api_constants() -> tuple[dict, dict, dict]:
         if isinstance(node, ast.List):
             return [evaluate(item) for item in node.elts]
         if isinstance(node, ast.Dict):
-            return {evaluate(key): evaluate(value) for key, value in zip(node.keys, node.values)}
+            return {
+                evaluate(key): evaluate(value)
+                for key, value in zip(node.keys, node.values)
+            }
         raise TypeError(f"Unsupported API table expression: {ast.dump(node)}")
 
     for statement in tree.body:
         target = None
         value = None
-        if isinstance(statement, ast.Assign) and len(statement.targets) == 1 and isinstance(statement.targets[0], ast.Name):
+        if (
+            isinstance(statement, ast.Assign)
+            and len(statement.targets) == 1
+            and isinstance(statement.targets[0], ast.Name)
+        ):
             target, value = statement.targets[0].id, statement.value
-        elif isinstance(statement, ast.AnnAssign) and isinstance(statement.target, ast.Name) and statement.value:
+        elif (
+            isinstance(statement, ast.AnnAssign)
+            and isinstance(statement.target, ast.Name)
+            and statement.value
+        ):
             target, value = statement.target.id, statement.value
-        if target in {"DEMO_USERS", "ROLE_BY_KIND", "ACTION_CARDS", "_APPROVE", "_REJECT"}:
+        if target in {
+            "DEMO_USERS",
+            "ROLE_BY_KIND",
+            "ACTION_CARDS",
+            "_APPROVE",
+            "_REJECT",
+        }:
             values[target] = evaluate(value)
     return values["DEMO_USERS"], values["ROLE_BY_KIND"], values["ACTION_CARDS"]
 
@@ -133,7 +174,9 @@ def test_every_graph_interrupt_is_claimable_by_exactly_one_demo_persona():
         roles = dynamic_roles.get(kind, {role_by_kind.get(kind)})
         assert None not in roles, f"{kind} has no API or payload role owner"
         for role in roles:
-            assert demo_roles.count(role) == 1, f"{kind} / {role} is not claimed by exactly one demo persona"
+            assert demo_roles.count(role) == 1, (
+                f"{kind} / {role} is not claimed by exactly one demo persona"
+            )
 
 
 def test_action_card_decisions_are_allowed_by_the_matching_graph_interrupt():
@@ -142,7 +185,9 @@ def test_action_card_decisions_are_allowed_by_the_matching_graph_interrupt():
     assert set(action_cards) == set(graph_specs)
     for kind, card in action_cards.items():
         offered = {decision["key"] for decision in card["decisions"]}
-        assert offered <= graph_specs[kind], f"{kind}: {offered - graph_specs[kind]} is offered but not allowed"
+        assert offered <= graph_specs[kind], (
+            f"{kind}: {offered - graph_specs[kind]} is offered but not allowed"
+        )
 
 
 def test_rework_reviewer_reject_then_logistics_resubmit_then_approvals_proceeds():
@@ -152,7 +197,9 @@ def test_rework_reviewer_reject_then_logistics_resubmit_then_approvals_proceeds(
     result = _resume_reviews(graph, initial["case_id"], result, "reject")
     assert interrupt_payloads(result)[0]["value"]["kind"] == "logistics_rework"
 
-    result = resume_case(graph, initial["case_id"], {"decision": "resubmit", "comment": "Corrected."})
+    result = resume_case(
+        graph, initial["case_id"], {"decision": "resubmit", "comment": "Corrected."}
+    )
     assert result["review_round"] == 2
     result = _resume_reviews(graph, initial["case_id"], result, "approve")
     assert interrupt_payloads(result)[0]["value"]["kind"] == "ceo_approval"
@@ -181,7 +228,9 @@ def test_ceo_tender_path_reaches_tender_preparation_and_logistics_can_resume():
     result = resume_case(graph, initial["case_id"], {"decision": "tender_request"})
     assert result["status"] == "pending_tender_preparation"
     assert interrupt_payloads(result)[0]["value"]["kind"] == "tender_preparation"
-    result = resume_case(graph, initial["case_id"], {"decision": "submit_tender_preparation"})
+    result = resume_case(
+        graph, initial["case_id"], {"decision": "submit_tender_preparation"}
+    )
     assert result["status"] == "tender_prepared"
 
 
@@ -197,8 +246,22 @@ def test_model_disabled_workflow_completes_without_provider_calls():
     assert result["model_used"] is False
 
 
+def test_documented_terminal_demo_completes(capsys):
+    runpy.run_path("run_demo.py", run_name="__main__")
+    output = capsys.readouterr().out
+    assert "finished with status: closed" in output
+
+
+def test_streamlit_adapter_uses_graph_decision_contract_and_handles_tender():
+    source = Path("app.py").read_text()
+    assert 'if kind == "tender_preparation"' in source
+    assert 'submit_response({"action":' not in source
+
+
 def test_all_agent_entry_points_fall_back_when_the_model_provider_fails(monkeypatch):
-    agents = ProcurementAgents(LocalKnowledgeBase(documents=DEMO_DOCUMENTS), model_name="test-provider")
+    agents = ProcurementAgents(
+        LocalKnowledgeBase(documents=DEMO_DOCUMENTS), model_name="test-provider"
+    )
     request = _request()
     research = SupplierResearch.model_validate(_research(100)["research"])
 
@@ -206,11 +269,19 @@ def test_all_agent_entry_points_fall_back_when_the_model_provider_fails(monkeypa
         def invoke(self, *args, **kwargs):
             raise ConnectionError("provider unavailable")
 
-    monkeypatch.setattr("procurement_demo.agents.create_agent", lambda **kwargs: BrokenAgent())
-    monkeypatch.setattr(agents, "_model", lambda: (_ for _ in ()).throw(ConnectionError("provider unavailable")))
+    monkeypatch.setattr(
+        "procurement_demo.agents.create_agent", lambda **kwargs: BrokenAgent()
+    )
+    monkeypatch.setattr(
+        agents,
+        "_model",
+        lambda: (_ for _ in ()).throw(ConnectionError("provider unavailable")),
+    )
 
     evidence = agents.prepare_supplier_evidence(request, research, thread_id="QA-1")
-    review_pack = agents.prepare_review_pack(request, research, evidence.content, thread_id="QA-1")
+    review_pack = agents.prepare_review_pack(
+        request, research, evidence.content, thread_id="QA-1"
+    )
     agreement = agents.draft_agreement(request, research, thread_id="QA-1")
     assert not evidence.used_model and "Supplier evidence prepared" in evidence.content
     assert not review_pack.used_model and "Review pack" in review_pack.content
